@@ -82,7 +82,7 @@ TeaLogger::TeaLogger()
     : m_logButton("Log Tea"), m_deleteButton("Delete Tea"), m_searchEntry() {
   m_logButton.set_margin(10);
   m_entry.set_placeholder_text("Enter tea name...");
-  m_searchEntry.set_placeholder_text("Seareturn_codeh Tea...");
+  m_searchEntry.set_placeholder_text("Search Term...");
 
   m_Columns.add(m_colID);
   m_Columns.add(m_colName);
@@ -117,6 +117,9 @@ TeaLogger::TeaLogger()
   if (!open_db()) {
     std::cerr << "Failed to open the database!" << std::endl;
   }
+
+  PopulateTreeview("");
+  show();
 }
 
 // this just closes the db when the application closes.
@@ -128,7 +131,7 @@ TeaLogger::~TeaLogger() {
 
 /// @brief Opens the SQLite3 database (or it creates one if it doesn't already
 /// exist)
-/// @return true/false
+/// @return
 bool TeaLogger::open_db() {
   int return_code = sqlite3_open("tea_log.db", &db);
   if (return_code) {
@@ -178,39 +181,62 @@ void TeaLogger::on_delete_button_clicked() {
 
 /// @brief logs the tea into the database
 /// @param tea_name
-void TeaLogger::log_tea(const std::string& tea_name) {
-  std::string sql =
-      "INSERT INTO tea_log (tea_name) VALUES ('" + tea_name + "');";
+bool TeaLogger::log_tea(const std::string& tea_name) {
+  const char* sql = "INSERT INTO tea_log (tea_name) VALUES (?);";
+  sqlite3_stmt* stmt;
+  int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
 
-  char* err_msg = nullptr;
-  int return_code = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &err_msg);
-  if (return_code != SQLITE_OK) {
-    std::cerr << "SQL error: " << err_msg << std::endl;
-    sqlite3_free(err_msg);
+  if (rc != SQLITE_OK) {
+    std::cerr << "Prepare failed: " << sqlite3_errmsg(db) << std::endl;
+    return false;
   }
+
+  rc = sqlite3_bind_text(stmt, 1, tea_name.c_str(), -1, SQLITE_STATIC);
+  if (rc != SQLITE_OK) {
+    std::cerr << "Bind failed: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  rc = sqlite3_step(stmt);
+  if (rc != SQLITE_DONE) {
+    std::cerr << "Step failed: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  sqlite3_finalize(stmt);
+  return true;
 }
 
 // deletes a tea from the database
-void TeaLogger::delete_tea(const std::string& tea_name) {
+bool TeaLogger::delete_tea(const std::string& tea_name) {
   const char* sql = "DELETE FROM tea_log WHERE tea_name = ?;";
   sqlite3_stmt* stmt;
   int return_code = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
 
   if (return_code != SQLITE_OK) {
     std::cerr << "Prepare failed: " << sqlite3_errmsg(db) << std::endl;
-  } else {
-    return_code =
-        sqlite3_bind_text(stmt, 1, tea_name.c_str(), -1, SQLITE_STATIC);
-    if (return_code != SQLITE_OK) {
-      std::cerr << "Bind failed: " << sqlite3_errmsg(db) << std::endl;
-    } else {
-      return_code = sqlite3_step(stmt);
-      if (return_code != SQLITE_DONE && return_code != SQLITE_ROW) {
-        std::cerr << "Step failed: " << sqlite3_errmsg(db) << std::endl;
-      }
-    }
-    sqlite3_finalize(stmt);
+    return false;
   }
+
+  return_code = sqlite3_bind_text(stmt, 1, tea_name.c_str(), -1, SQLITE_STATIC);
+  if (return_code != SQLITE_OK) {
+    std::cerr << "Bind failed: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  return_code = sqlite3_step(stmt);
+
+  if (return_code != SQLITE_DONE) {
+    std::cerr << "Step failed: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  sqlite3_finalize(stmt);
+  return true;
 }
 
 /// @brief populates the listbox with the search

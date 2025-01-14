@@ -23,8 +23,8 @@ class TeaLogger : public Gtk::Window {
   void on_delete_button_clicked();
 
   void PopulateTreeview(const std::string& searchTerm = "");
-  void log_tea(const std::string& tea_name);
-  void delete_tea(const std::string& tea_name);
+  bool log_tea(const std::string& tea_name);
+  bool delete_tea(const std::string& tea_name);
 
   sqlite3* db;
 
