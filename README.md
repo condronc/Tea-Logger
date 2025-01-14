@@ -9,6 +9,9 @@ https://gtkmm.gnome.org/en/documentation.html
 ## Description of Project
 Built with C++ and Gtkmm (a cross-platform toolkit often used with GNOME), this project does not include platform specific build details.
 
+Current look of the program:
+![alt text](data/01142025.png)
+
 ### Current Features
 - Add a tea by name
 - Delete a tea by name
