@@ -5,6 +5,7 @@
 #include <gtkmm/button.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/searchentry.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/window.h>
 #include <sqlite3.h>
@@ -32,7 +33,7 @@ class TeaLogger : public Gtk::Window {
   Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
 
   Gtk::TreeModelColumn<int> m_colID;
-  Gtk::TreeModelColumn<std::string> m_colName, m_colDate;
+  Gtk::TreeModelColumn<std::string> m_colName, m_colLocal, m_colUtc;
 
   Gtk::TreeModelColumnRecord m_Columns;
 };

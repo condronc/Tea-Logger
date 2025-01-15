@@ -25,7 +25,8 @@ TeaDatabase::TeaDatabase(const std::string& db_path) : db(db_path) {
       CREATE TABLE IF NOT EXISTS tea_log (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           tea_name TEXT NOT NULL,
-          date_logged TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          local_time DATE DEFAULT (datetime('now', 'localtime')),
+          utc_time DATE DEFAULT (datetime('now', 'utc'))
       );
   )");
 }
