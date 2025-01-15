@@ -33,6 +33,7 @@ void TeaLogger::PopulateTreeview(const std::string& search_Term) {
   if (return_code != SQLITE_OK) {
     std::cerr << "Prepare failed: " << sqlite3_errmsg(db)
               << " (Error code: " << return_code << ")" << std::endl;
+    sqlite3_finalize(stmt);
     return;
   }
 
@@ -73,7 +74,6 @@ void TeaLogger::PopulateTreeview(const std::string& search_Term) {
     std::cerr << "Step failed: " << sqlite3_errmsg(db)
               << " (Error code: " << return_code << ")" << std::endl;
   }
-
   sqlite3_finalize(stmt);
 }
 
@@ -184,22 +184,22 @@ void TeaLogger::on_delete_button_clicked() {
 bool TeaLogger::log_tea(const std::string& tea_name) {
   const char* sql = "INSERT INTO tea_log (tea_name) VALUES (?);";
   sqlite3_stmt* stmt;
-  int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+  int return_code = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
 
-  if (rc != SQLITE_OK) {
+  if (return_code != SQLITE_OK) {
     std::cerr << "Prepare failed: " << sqlite3_errmsg(db) << std::endl;
     return false;
   }
 
-  rc = sqlite3_bind_text(stmt, 1, tea_name.c_str(), -1, SQLITE_STATIC);
-  if (rc != SQLITE_OK) {
+  return_code = sqlite3_bind_text(stmt, 1, tea_name.c_str(), -1, SQLITE_STATIC);
+  if (return_code != SQLITE_OK) {
     std::cerr << "Bind failed: " << sqlite3_errmsg(db) << std::endl;
     sqlite3_finalize(stmt);
     return false;
   }
 
-  rc = sqlite3_step(stmt);
-  if (rc != SQLITE_DONE) {
+  return_code = sqlite3_step(stmt);
+  if (return_code != SQLITE_DONE) {
     std::cerr << "Step failed: " << sqlite3_errmsg(db) << std::endl;
     sqlite3_finalize(stmt);
     return false;

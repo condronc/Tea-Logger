@@ -1,5 +1,5 @@
 # Tea Logger
-Project is written in CPP using Gktmm as a wrapper for Gtk. It also makes use of SQLite3 for a simple database system.
+Built with C++ and Gtkmm (a cross-platform toolkit often used with GNOME), this project does not include platform specific build details. The project also features the use of SQLite3.
 
 You can read more about Gtkmm here:
 
@@ -7,9 +7,9 @@ https://gtkmm.gnome.org/en/documentation.html
 
 
 ## Description of Project
-Built with C++ and Gtkmm (a cross-platform toolkit often used with GNOME), this project does not include platform specific build details.
 
 Current look of the program:
+
 ![alt text](data/01142025.png)
 
 ### Current Features
