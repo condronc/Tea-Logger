@@ -4,7 +4,6 @@
 #include <sqlite3.h>
 
 #include <map>
-#include <stdexcept>
 #include <string>
 #include <vector>
 

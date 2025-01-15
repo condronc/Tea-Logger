@@ -1,13 +1,10 @@
-#ifndef GTKMM_TEA_LOGGER_HPP
-#define GTKMM_TEA_LOGGER_HPP
+#ifndef TEA_LOGGER_HPP
+#define TEA_LOGGER_HPP
 
 #include <glibmm/refptr.h>
 #include <gtkmm/button.h>
 #include <gtkmm/entry.h>
-#include <gtkmm/listbox.h>
 #include <gtkmm/liststore.h>
-#include <gtkmm/searchentry.h>
-#include <gtkmm/treemodelfilter.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/window.h>
 #include <sqlite3.h>
@@ -32,12 +29,11 @@ class TeaLogger : public Gtk::Window {
   Gtk::Entry m_entry;
 
   Gtk::TreeView m_treeView;
-  Gtk::ListBox m_listBox;
-
   Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
-  Glib::RefPtr<Gtk::TreeModelFilter> m_refTreeFilter;
+
   Gtk::TreeModelColumn<int> m_colID;
   Gtk::TreeModelColumn<std::string> m_colName, m_colDate;
+
   Gtk::TreeModelColumnRecord m_Columns;
 };
 

@@ -1,9 +1,6 @@
 #include "tea_logger.hpp"
 
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
 #include <gtkmm.h>
-#include <sqlite3.h>
 
 #include <iostream>
 #include <map>
@@ -134,5 +131,9 @@ void TeaLogger::on_delete_button_clicked() {
 /// @brief populates the listbox with the search
 void TeaLogger::on_search_changed() {
   std::string search_Term = m_searchEntry.get_text();
-  PopulateTreeview(search_Term);
+  if (search_Term.empty()) {
+    PopulateTreeview("");
+  } else {
+    PopulateTreeview(search_Term);
+  }
 }

@@ -1,10 +1,8 @@
 #include <gtkmm/application.h>
 
-#include <iostream>
-
 #include "tea_logger.hpp"
 
-// Reference form Gtkmm
+// Reference from Gtkmm
 int main(int argc, char* argv[]) {
   auto app = Gtk::Application::create("org.gtkmm.example");
 
