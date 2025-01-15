@@ -10,7 +10,7 @@ https://gtkmm.gnome.org/en/documentation.html
 
 Current look of the program:
 
-![alt text](data/01142025-2.png)
+![alt text](data/01152025.png)
 
 ### Current Features
 - Add a tea by name
