@@ -13,8 +13,6 @@
 
 TeaLogger::~TeaLogger() = default;
 
-#include <glibmm/ustring.h>
-
 /// @brief populates the TreeView of all current items in the data base or by
 /// search terms
 /// @param search_Term
@@ -28,33 +26,30 @@ void TeaLogger::PopulateTreeview(const std::string& search_Term) {
     params.push_back("%" + search_Term + "%");
   }
   sql += " ORDER BY tea_name ASC";
-  std::vector<std::map<std::string, std::string>> query_results =
-      teadatabase.execute_query(sql, params);
-  for (const auto& row : query_results) {
-    Gtk::TreeModel::Row tree_row = *(m_refTreeModel->append());
-    try {
-      tree_row[m_colID] = std::stoi(row.at("id"));
-    } catch (const std::invalid_argument& e) {
-      std::cerr << "Error converting ID to integer: " << e.what()
-                << ". ID value: " << row.at("id") << std::endl;
-      continue;
-    } catch (const std::out_of_range& e) {
-      std::cerr << "Error converting ID to integer (out of range): " << e.what()
-                << ". ID value: " << row.at("id") << std::endl;
-      continue;
+  try {
+    std::vector<std::map<std::string, std::string>> query_results =
+        teadatabase.execute_query(sql, params);
+    if (query_results.empty()) {
+      return;
     }
-    try {
-      tree_row[m_colName] = std::string(row.at("tea_name"));
-    } catch (const std::out_of_range& e) {
-      std::cerr << "Error getting tea_name: " << e.what() << std::endl;
-      continue;
+
+    for (const auto& row : query_results) {
+      Gtk::TreeModel::Row treeRow = *(m_refTreeModel->append());
+      try {
+        treeRow[m_colID] = std::stoi(row.at("id"));
+        treeRow[m_colName] = row.at("tea_name");
+        treeRow[m_colDate] = row.at("date_logged");
+      } catch (const std::out_of_range& oor) {
+        std::cerr << "Error accessing database field: " << oor.what()
+                  << std::endl;
+        continue;
+      } catch (const std::invalid_argument& ia) {
+        std::cerr << "Error converting ID: " << ia.what() << std::endl;
+        continue;
+      }
     }
-    try {
-      tree_row[m_colDate] = std::string(row.at("date_logged"));
-    } catch (const std::out_of_range& e) {
-      std::cerr << "Error getting date_logged: " << e.what() << std::endl;
-      continue;
-    }
+  } catch (const std::exception& e) {
+    std::cerr << "Error executing database query: " << e.what() << std::endl;
   }
 }
 
@@ -68,6 +63,7 @@ TeaLogger::TeaLogger()
   m_searchEntry.set_margin(10);
   m_deleteButton.set_margin(10);
   m_treeView.set_margin(10);
+  m_entry.set_margin(10);
   m_entry.set_placeholder_text("Enter tea name...");
   m_searchEntry.set_placeholder_text("Search Term...");
 
