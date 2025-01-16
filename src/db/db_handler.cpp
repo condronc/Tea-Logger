@@ -31,9 +31,9 @@ TeaDatabase::TeaDatabase(const std::string& db_path) : db(db_path) {
   )");
 }
 
-std::vector<std::map<std::string, std::string>> TeaDatabase::execute_query(
+std::vector<TeaLogEntry> TeaDatabase::execute_query(
     const std::string& sql, const std::vector<std::string>& params) {
-  std::vector<std::map<std::string, std::string>> results;
+  std::vector<TeaLogEntry> results;
   sqlite3_stmt* stmt;
 
   if (sqlite3_prepare_v2(db.get(), sql.c_str(), -1, &stmt, nullptr) !=
@@ -47,14 +47,14 @@ std::vector<std::map<std::string, std::string>> TeaDatabase::execute_query(
   }
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
-    std::map<std::string, std::string> row;
-    int cols = sqlite3_column_count(stmt);
-    for (int i = 0; i < cols; ++i) {
-      const char* name = sqlite3_column_name(stmt, i);
-      const char* value = (const char*)sqlite3_column_text(stmt, i);
-      row[name] = value ? value : "";
-    }
-    results.push_back(row);
+    int id = sqlite3_column_int(stmt, 0);
+    const char* tea_name = (const char*)sqlite3_column_text(stmt, 1);
+    const char* local_time = (const char*)sqlite3_column_text(stmt, 2);
+    const char* utc_time = (const char*)sqlite3_column_text(stmt, 3);
+
+    results.emplace_back(id, tea_name ? tea_name : "",
+                         local_time ? local_time : "",
+                         utc_time ? utc_time : "");
   }
 
   sqlite3_finalize(stmt);
@@ -121,4 +121,26 @@ bool TeaDatabase::delete_tea(const std::string& tea_name) {
 
   sqlite3_finalize(stmt);
   return true;
+}
+
+std::vector<TeaLogEntry> TeaDatabase::get_all_entries(
+    const std::string& search_Term) {
+  std::vector<TeaLogEntry> entries;
+  std::string sql = "SELECT id, tea_name, local_time, utc_time FROM tea_log";
+  std::vector<std::string> params;
+
+  if (!search_Term.empty()) {
+    sql += " WHERE tea_name LIKE ?";
+    params.push_back("%" + search_Term + "%");
+  }
+
+  sql += " ORDER BY tea_name ASC";
+
+  auto query_results = execute_query(sql, params);
+  for (const auto& row : query_results) {
+    TeaLogEntry entry(row.id, row.tea_name, row.local_time, row.utc_time);
+    entries.push_back(entry);
+  }
+
+  return entries;
 }

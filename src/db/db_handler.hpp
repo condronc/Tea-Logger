@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "../models/tea.hpp"
+
 class SQLiteDB {
  public:
   SQLiteDB(const std::string& db_path);
@@ -20,11 +22,13 @@ class SQLiteDB {
 class TeaDatabase {
  public:
   TeaDatabase(const std::string& db_path);
-  std::vector<std::map<std::string, std::string>> execute_query(
-      const std::string& sql, const std::vector<std::string>& params = {});
   void execute_sql(const std::string& sql);
   bool log_tea(const std::string& tea_name);
   bool delete_tea(const std::string& tea_name);
+
+  std::vector<TeaLogEntry> execute_query(
+      const std::string& sql, const std::vector<std::string>& params);
+  std::vector<TeaLogEntry> get_all_entries(const std::string& search_Term);
 
  private:
   SQLiteDB db;
