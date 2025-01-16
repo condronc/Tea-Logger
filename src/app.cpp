@@ -12,22 +12,50 @@
 
 #include "db/db_handler.hpp"
 #include "models/tea.hpp"
+#include "ui/ui_elements.hpp"
+#include "ui/ui_layout.hpp"
+#include "ui/ui_style.hpp"
+#include "utility/signal_utility.hpp"
 
 App::~App() = default;
+
+App::App()
+    : m_logButton("Log Tea"),
+      m_deleteButton("Delete Tea"),
+      m_searchEntry(),
+      teadatabase("tea_log.db") {
+  UiStyle::initialize_styling();
+
+  UiElements ui_elements;
+
+  ui_elements.setup_treeview(m_treeView, m_refTreeModel, m_colID, m_colName,
+                             m_colLocal, m_colUtc);
+  Gtk::Box* sidebar = ui_elements.create_sidebar(m_entry, m_searchEntry,
+                                                 m_logButton, m_deleteButton);
+  Gtk::Box* main_content = ui_elements.create_main_content(m_treeView);
+  Gtk::Box* main_box = ui_elements.create_main_box(sidebar, main_content);
+
+  // sets up layout
+  UiLayout::arrange_layout(*this, main_box);
+
+  // connect signals
+  Utility::connect_signals(*this);
+
+  PopulateTreeview("");
+  show();
+}
 
 /// @brief populates the TreeView of all current items in the data base or by
 /// search terms
 /// @param search_Term
-void App::PopulateTreeview(const std::string& search_Term) {
+void App::PopulateTreeview(const std::string& searchTerm) {
   m_refTreeModel->clear();
-
   try {
     std::vector<TeaLogEntry> query_results =
-        teadatabase.get_all_entries(search_Term);
+        teadatabase.get_all_entries(searchTerm);
     if (query_results.empty()) {
       return;
     }
-
     for (const auto& entry : query_results) {
       Gtk::TreeModel::Row treeRow = *(m_refTreeModel->append());
       treeRow[m_colID] = entry.id;
@@ -38,77 +66,6 @@ void App::PopulateTreeview(const std::string& search_Term) {
   } catch (const std::exception& e) {
     std::cerr << "Error executing database query: " << e.what() << std::endl;
   }
-}
-
-App::App()
-    : m_logButton("Log Tea"),
-      m_deleteButton("Delete Tea"),
-      m_searchEntry(),
-      teadatabase("tea_log.db") {
-  Glib::RefPtr<Gtk::CssProvider> css_provider = Gtk::CssProvider::create();
-  css_provider->load_from_path("src/style.css");
-  Glib::RefPtr<Gdk::Display> display = Gdk::Display::get_default();
-  Gtk::StyleContext::add_provider_for_display(
-      display, css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-
-  Gtk::Box* sidebar = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
-  sidebar->append(m_entry);
-  sidebar->append(m_searchEntry);
-  sidebar->append(m_logButton);
-  sidebar->append(m_deleteButton);
-
-  Gtk::Box* main_content =
-      Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
-
-  m_Columns.add(m_colID);
-  m_Columns.add(m_colName);
-  m_Columns.add(m_colLocal);
-  m_Columns.add(m_colUtc);
-
-  m_refTreeModel = Gtk::ListStore::create(m_Columns);
-  m_treeView.set_model(m_refTreeModel);
-  m_treeView.append_column("ID", m_colID);
-  m_treeView.append_column("Name", m_colName);
-  m_treeView.append_column("Local Date Logged", m_colLocal);
-  m_treeView.append_column("UTC Date Logged", m_colUtc);
-
-  auto scrolledWindow = Gtk::manage(new Gtk::ScrolledWindow());
-  scrolledWindow->set_expand(true);
-  scrolledWindow->set_child(m_treeView);
-
-  main_content->append(*scrolledWindow);
-
-  Gtk::Box* main_box =
-      Gtk::manage(new Gtk::Box(Gtk::Orientation::HORIZONTAL, 10));
-  main_box->set_margin(10);
-  main_box->set_hexpand(true);
-
-  sidebar->set_hexpand(false);
-  main_content->set_hexpand(true);
-  main_content->set_vexpand(true);
-
-  main_box->append(*sidebar);
-  main_box->append(*main_content);
-
-  set_child(*main_box);
-
-  m_logButton.set_margin(10);
-  m_searchEntry.set_margin(10);
-  m_deleteButton.set_margin(10);
-  m_treeView.set_margin(10);
-  m_entry.set_margin(10);
-  m_entry.set_placeholder_text("Enter tea name...");
-  m_searchEntry.set_placeholder_text("Search Term...");
-
-  m_logButton.signal_clicked().connect(
-      sigc::mem_fun(*this, &App::on_log_button_clicked));
-  m_deleteButton.signal_clicked().connect(
-      sigc::mem_fun(*this, &App::on_delete_button_clicked));
-  m_searchEntry.signal_changed().connect(
-      sigc::mem_fun(*this, &App::on_search_changed));
-
-  PopulateTreeview("");
-  show();
 }
 
 /// @brief uses the log_tea function

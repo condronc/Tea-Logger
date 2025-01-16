@@ -1,5 +1,5 @@
-#ifndef TEA_LOGGER_HPP
-#define TEA_LOGGER_HPP
+#ifndef APP_HPP
+#define APP_HPP
 
 #include <glibmm/refptr.h>
 #include <gtkmm/button.h>
@@ -22,8 +22,9 @@ class App : public Gtk::Window {
   void on_log_button_clicked();
   void on_search_changed();
   void on_delete_button_clicked();
-
   void PopulateTreeview(const std::string& searchTerm = "");
+
+  friend class Utility;
 
   Gtk::Button m_logButton, m_deleteButton;
   Gtk::SearchEntry m_searchEntry;
