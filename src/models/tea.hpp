@@ -3,6 +3,7 @@
 
 #include <string>
 
+/// @brief represents an entry in the database
 struct TeaLogEntry {
   int id;
   std::string tea_name;

@@ -19,17 +19,20 @@
 
 App::~App() = default;
 
+/// @brief constructor for the application
 App::App()
     : m_logButton("Log Tea"),
       m_deleteButton("Delete Tea"),
       m_searchEntry(),
-      teadatabase("tea_log.db") {
+      teadatabase("tea_database.db") {
+  // injects css
   UiStyle::initialize_styling();
 
   UiElements ui_elements;
-
+  // sets up the tree view
   ui_elements.setup_treeview(m_treeView, m_refTreeModel, m_colID, m_colName,
                              m_colLocal, m_colUtc);
+  // creates ui elements
   Gtk::Box* sidebar = ui_elements.create_sidebar(m_entry, m_searchEntry,
                                                  m_logButton, m_deleteButton);
   Gtk::Box* main_content = ui_elements.create_main_content(m_treeView);
@@ -41,8 +44,8 @@ App::App()
   // connect signals
   Utility::connect_signals(*this);
 
+  // populate the tree view with all tea entries shown
   PopulateTreeview("");
-  show();
 }
 
 /// @brief populates the TreeView of all current items in the data base or by
@@ -52,7 +55,7 @@ void App::PopulateTreeview(const std::string& searchTerm) {
   m_refTreeModel->clear();
   try {
     std::vector<TeaLogEntry> query_results =
-        teadatabase.get_all_entries(searchTerm);
+        teadatabase.find_tea_entries(searchTerm);
     if (query_results.empty()) {
       return;
     }

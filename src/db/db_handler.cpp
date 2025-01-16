@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+/// @brief Attempts to open the SQLite database
+/// @param db_path
 SQLiteDB::SQLiteDB(const std::string& db_path) {
   if (sqlite3_open(db_path.c_str(), &db) != SQLITE_OK) {
     throw std::runtime_error("Failed to open database: " +
@@ -9,6 +11,8 @@ SQLiteDB::SQLiteDB(const std::string& db_path) {
   }
 }
 
+/// @brief Checks for connection if db is not null (only closes if a connection
+/// was made)
 SQLiteDB::~SQLiteDB() {
   if (db) {
     sqlite3_close(db);
@@ -20,9 +24,11 @@ SQLiteDB::~SQLiteDB() {
 // it wont modify the db object.
 sqlite3* SQLiteDB::get() const { return db; }
 
+/// @brief Creates a database if one does not exist
+/// @param db_path
 TeaDatabase::TeaDatabase(const std::string& db_path) : db(db_path) {
   execute_sql(R"(
-      CREATE TABLE IF NOT EXISTS tea_log (
+      CREATE TABLE IF NOT EXISTS tea_database (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           tea_name TEXT NOT NULL,
           local_time DATE DEFAULT (datetime('now', 'localtime')),
@@ -31,6 +37,10 @@ TeaDatabase::TeaDatabase(const std::string& db_path) : db(db_path) {
   )");
 }
 
+/// @brief executes SQL against the databse - parameter binding.
+/// @param sql
+/// @param params
+/// @return results
 std::vector<TeaLogEntry> TeaDatabase::execute_query(
     const std::string& sql, const std::vector<std::string>& params) {
   std::vector<TeaLogEntry> results;
@@ -61,6 +71,9 @@ std::vector<TeaLogEntry> TeaDatabase::execute_query(
   return results;
 }
 
+/// @brief executes the SQL against the database - non parameter binding. It is
+/// used when the database is first created.
+/// @param sql
 void TeaDatabase::execute_sql(const std::string& sql) {
   char* errMessage = nullptr;
   int return_code =
@@ -77,21 +90,22 @@ void TeaDatabase::execute_sql(const std::string& sql) {
   }
 }
 
+/// @brief Logs a tea
+/// @param tea_name
+/// @return if the function fails return false, otherwise true
 bool TeaDatabase::log_tea(const std::string& tea_name) {
-  const char* sql = "INSERT INTO tea_log (tea_name) VALUES (?);";
+  const char* sql = "INSERT INTO tea_database (tea_name) VALUES (?);";
   sqlite3_stmt* stmt = nullptr;
 
-  int return_code = sqlite3_prepare_v2(db.get(), sql, -1, &stmt, nullptr);
-  if (return_code != SQLITE_OK) {
+  if (sqlite3_prepare_v2(db.get(), sql, -1, &stmt, nullptr) != SQLITE_OK) {
     std::cerr << "Prepare failed: " << sqlite3_errmsg(db.get()) << std::endl;
     return false;
   }
 
   sqlite3_bind_text(stmt, 1, tea_name.c_str(), -1, SQLITE_STATIC);
 
-  int step_result = sqlite3_step(stmt);
-  if (step_result != SQLITE_DONE && step_result != SQLITE_ROW) {
-    std::cerr << "Step failed: " << sqlite3_errstr(sqlite3_errcode(db.get()))
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    std::cerr << "Log failed: " << sqlite3_errstr(sqlite3_errcode(db.get()))
               << std::endl;
     sqlite3_finalize(stmt);
     return false;
@@ -101,8 +115,11 @@ bool TeaDatabase::log_tea(const std::string& tea_name) {
   return true;
 }
 
+/// @brief Deletes a tea
+/// @param tea_name
+/// @return if the function fails return false, otherwise true
 bool TeaDatabase::delete_tea(const std::string& tea_name) {
-  const char* sql = "DELETE FROM tea_log WHERE tea_name = ?;";
+  const char* sql = "DELETE FROM tea_database WHERE tea_name = ?;";
   sqlite3_stmt* stmt = nullptr;
 
   if (sqlite3_prepare_v2(db.get(), sql, -1, &stmt, nullptr) != SQLITE_OK) {
@@ -123,10 +140,14 @@ bool TeaDatabase::delete_tea(const std::string& tea_name) {
   return true;
 }
 
-std::vector<TeaLogEntry> TeaDatabase::get_all_entries(
+/// @brief  finds tea entries based on the parameter
+/// @param search_Term
+/// @return entries
+std::vector<TeaLogEntry> TeaDatabase::find_tea_entries(
     const std::string& search_Term) {
   std::vector<TeaLogEntry> entries;
-  std::string sql = "SELECT id, tea_name, local_time, utc_time FROM tea_log";
+  std::string sql =
+      "SELECT id, tea_name, local_time, utc_time FROM tea_database";
   std::vector<std::string> params;
 
   if (!search_Term.empty()) {

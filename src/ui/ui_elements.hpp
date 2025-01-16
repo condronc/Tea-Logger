@@ -9,6 +9,7 @@
 #include <gtkmm/searchentry.h>
 #include <gtkmm/treeview.h>
 
+/// @brief class for creating and managing ui elements
 class UiElements {
  public:
   UiElements();

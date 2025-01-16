@@ -3,12 +3,11 @@
 
 #include <sqlite3.h>
 
-#include <map>
-#include <string>
 #include <vector>
 
 #include "../models/tea.hpp"
 
+/// @brief Handles the database connection
 class SQLiteDB {
  public:
   SQLiteDB(const std::string& db_path);
@@ -19,6 +18,7 @@ class SQLiteDB {
   sqlite3* db = nullptr;
 };
 
+/// @brief Provides methods for interacting with the sqlite database
 class TeaDatabase {
  public:
   TeaDatabase(const std::string& db_path);
@@ -28,7 +28,7 @@ class TeaDatabase {
 
   std::vector<TeaLogEntry> execute_query(
       const std::string& sql, const std::vector<std::string>& params);
-  std::vector<TeaLogEntry> get_all_entries(const std::string& search_Term);
+  std::vector<TeaLogEntry> find_tea_entries(const std::string& search_Term);
 
  private:
   SQLiteDB db;

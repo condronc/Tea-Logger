@@ -1,7 +1,14 @@
 #include "ui_elements.hpp"
 
+/// @brief default constructor
 UiElements::UiElements() {}
 
+/// @brief creates a vertical box for containing sidebar elements
+/// @param entry
+/// @param searchEntry
+/// @param logButton
+/// @param deleteButton
+/// @return pointer to the created sidebar
 Gtk::Box* UiElements::create_sidebar(Gtk::Entry& entry,
                                      Gtk::SearchEntry& searchEntry,
                                      Gtk::Button& logButton,
@@ -14,6 +21,9 @@ Gtk::Box* UiElements::create_sidebar(Gtk::Entry& entry,
   return sidebar;
 }
 
+/// @brief creates the main content area containing the tree view
+/// @param treeView
+/// @return pointer to the created main content
 Gtk::Box* UiElements::create_main_content(Gtk::TreeView& treeView) {
   Gtk::Box* main_content =
       Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
@@ -26,6 +36,11 @@ Gtk::Box* UiElements::create_main_content(Gtk::TreeView& treeView) {
   return main_content;
 }
 
+/// @brief creates the main horizontal box containing the sidebar and main
+/// content
+/// @param sidebar
+/// @param main_content
+/// @return a pointer to the created main box
 Gtk::Box* UiElements::create_main_box(Gtk::Box* sidebar,
                                       Gtk::Box* main_content) {
   Gtk::Box* main_box =
@@ -42,6 +57,13 @@ Gtk::Box* UiElements::create_main_box(Gtk::Box* sidebar,
   return main_box;
 }
 
+/// @brief sets up the tree view with columns and the refmodel
+/// @param treeView
+/// @param refTreeModel
+/// @param colID
+/// @param colName
+/// @param colLocal
+/// @param colUtc
 void UiElements::setup_treeview(Gtk::TreeView& treeView,
                                 Glib::RefPtr<Gtk::ListStore>& refTreeModel,
                                 Gtk::TreeModelColumn<int>& colID,
