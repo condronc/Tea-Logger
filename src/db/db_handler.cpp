@@ -165,3 +165,28 @@ std::vector<TeaLogEntry> TeaDatabase::find_tea_entries(
 
   return entries;
 }
+
+/// @brief updates the database for editing
+/// @param tea_id
+/// @param new_name
+void TeaDatabase::update_tea_name(int tea_id, const std::string& new_name) {
+  try {
+    sqlite3_stmt* stmt;
+    const char* query = "UPDATE tea_database SET tea_name = ? WHERE id = ?";
+    if (sqlite3_prepare_v2(db.get(), query, -1, &stmt, nullptr) != SQLITE_OK) {
+      throw std::runtime_error("Failed to prepare SQL statement");
+    }
+
+    sqlite3_bind_text(stmt, 1, new_name.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 2, tea_id);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+      throw std::runtime_error("Failed to update tea name");
+    }
+
+    sqlite3_finalize(stmt);
+  } catch (const std::exception& e) {
+    std::cerr << "Error updating tea name in database: " << e.what()
+              << std::endl;
+  }
+}

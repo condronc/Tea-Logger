@@ -20,13 +20,14 @@ class App : public Gtk::Window {
  protected:
   TeaDatabase teadatabase;
   void on_log_button_clicked();
+  void on_edit_button_clicked();
   void on_search_changed();
   void on_delete_button_clicked();
   void PopulateTreeview(const std::string& searchTerm = "");
 
   friend class Utility;
 
-  Gtk::Button m_logButton, m_deleteButton;
+  Gtk::Button m_logButton, m_deleteButton, m_editButton;
   Gtk::SearchEntry m_searchEntry;
   Gtk::Entry m_entry;
 

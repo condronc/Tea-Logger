@@ -15,7 +15,8 @@ class UiElements {
   UiElements();
 
   Gtk::Box* create_sidebar(Gtk::Entry& entry, Gtk::SearchEntry& searchEntry,
-                           Gtk::Button& logButton, Gtk::Button& deleteButton);
+                           Gtk::Button& logButton, Gtk::Button& deleteButtonm,
+                           Gtk::Button& editButton);
 
   Gtk::Box* create_main_content(Gtk::TreeView& treeView);
 

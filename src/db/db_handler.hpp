@@ -24,6 +24,7 @@ class TeaDatabase {
   TeaDatabase(const std::string& db_path);
   void execute_sql(const std::string& sql);
   bool log_tea(const std::string& tea_name);
+  void update_tea_name(int tea_id, const std::string& new_name);
   bool delete_tea(const std::string& tea_name);
 
   std::vector<TeaLogEntry> execute_query(

@@ -12,11 +12,13 @@ UiElements::UiElements() {}
 Gtk::Box* UiElements::create_sidebar(Gtk::Entry& entry,
                                      Gtk::SearchEntry& searchEntry,
                                      Gtk::Button& logButton,
+                                     Gtk::Button& editButton,
                                      Gtk::Button& deleteButton) {
   Gtk::Box* sidebar = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
   sidebar->append(entry);
   sidebar->append(searchEntry);
   sidebar->append(logButton);
+  sidebar->append(editButton);
   sidebar->append(deleteButton);
   return sidebar;
 }

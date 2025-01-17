@@ -11,4 +11,6 @@ void Utility::connect_signals(App& app) {
       sigc::mem_fun(app, &App::on_delete_button_clicked));
   app.m_searchEntry.signal_changed().connect(
       sigc::mem_fun(app, &App::on_search_changed));
+  app.m_editButton.signal_clicked().connect(
+      sigc::mem_fun(app, &App::on_edit_button_clicked));
 }
