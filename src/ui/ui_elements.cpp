@@ -12,14 +12,20 @@ UiElements::UiElements() {}
 Gtk::Box* UiElements::create_sidebar(Gtk::Entry& entry,
                                      Gtk::SearchEntry& searchEntry,
                                      Gtk::Button& logButton,
-                                     Gtk::Button& editButton,
-                                     Gtk::Button& deleteButton) {
+                                     Gtk::Button& deleteButton,
+                                     Gtk::Button& editButton) {
   Gtk::Box* sidebar = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
+  entry.set_placeholder_text("Enter tea...");
+  logButton.set_label("Log Tea");
+  deleteButton.set_label("Delete Tea");
+  editButton.set_label("Edit tea");
+  searchEntry.set_placeholder_text("Search tea...");
   sidebar->append(entry);
   sidebar->append(searchEntry);
   sidebar->append(logButton);
-  sidebar->append(editButton);
   sidebar->append(deleteButton);
+  sidebar->append(editButton);
+
   return sidebar;
 }
 
@@ -85,4 +91,39 @@ void UiElements::setup_treeview(Gtk::TreeView& treeView,
   treeView.append_column("Name", colName);
   treeView.append_column("Local Time", colLocal);
   treeView.append_column("UTC Time", colUtc);
+}
+
+Gtk::Window* UiElements::create_edit_window(
+    const std::string& tea_name,
+    std::function<void(const std::string&)> on_save) {
+  auto edit_window = Gtk::make_managed<Gtk::Window>();
+  edit_window->set_title("Edit Tea Name");
+  edit_window->set_default_size(300, 150);
+
+  auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 10);
+  edit_window->set_child(*vbox);
+
+  auto label = Gtk::make_managed<Gtk::Label>("Enter new tea name:");
+  vbox->append(*label);
+
+  auto entry = Gtk::make_managed<Gtk::Entry>();
+  entry->set_text(tea_name);
+  vbox->append(*entry);
+
+  auto hbox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 10);
+  vbox->append(*hbox);
+
+  auto cancel_button = Gtk::make_managed<Gtk::Button>("Cancel");
+  cancel_button->signal_clicked().connect(
+      [edit_window]() { edit_window->hide(); });
+  hbox->append(*cancel_button);
+
+  auto save_button = Gtk::make_managed<Gtk::Button>("Save");
+  save_button->signal_clicked().connect([on_save, entry, edit_window]() {
+    on_save(entry->get_text());
+    edit_window->hide();
+  });
+  hbox->append(*save_button);
+
+  return edit_window;
 }

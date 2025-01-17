@@ -4,10 +4,14 @@
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/entry.h>
+#include <gtkmm/label.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/searchentry.h>
 #include <gtkmm/treeview.h>
+#include <gtkmm/window.h>
+
+#include "../models/tea.hpp"
 
 /// @brief class for creating and managing ui elements
 class UiElements {
@@ -21,6 +25,10 @@ class UiElements {
   Gtk::Box* create_main_content(Gtk::TreeView& treeView);
 
   Gtk::Box* create_main_box(Gtk::Box* sidebar, Gtk::Box* main_content);
+
+  Gtk::Window* create_edit_window(
+      const std::string& tea_name,
+      std::function<void(const std::string&)> on_save);
 
   void setup_treeview(Gtk::TreeView& treeView,
                       Glib::RefPtr<Gtk::ListStore>& refTreeModel,

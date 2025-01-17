@@ -19,6 +19,10 @@ class App : public Gtk::Window {
 
  protected:
   TeaDatabase teadatabase;
+
+  // Adds tea entries to the treeview model.
+  // void AddEntriesToTree(const std::vector<TeaLogEntry>& entries);
+
   void on_log_button_clicked();
   void on_edit_button_clicked();
   void on_search_changed();

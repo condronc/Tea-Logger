@@ -162,7 +162,6 @@ std::vector<TeaLogEntry> TeaDatabase::find_tea_entries(
     TeaLogEntry entry(row.id, row.tea_name, row.local_time, row.utc_time);
     entries.push_back(entry);
   }
-
   return entries;
 }
 
