@@ -10,15 +10,21 @@ https://gtkmm.gnome.org/en/documentation.html
 
 Current look of the program:
 
-![alt text](data/01152025.png)
+![alt text](data/01172025-2.png)
+
+Edit window:
+
+![alt text](data/01172025.png)
 
 ### Current Features
 - Add a tea by name
 - Delete a tea by name
 - Search a tea by name
+- Edit and save an entry by selecting
+  - *time edited not done currently*
 
 ### Planned Features/Short Goals
-- Edit entries
+- ~~Edit entries~~
 - Add more and detailed fields to be entered for a tea
   - Ex: Brand, Tea Type, Personal ratings...
 - Flavor dictionary
