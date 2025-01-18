@@ -9,8 +9,7 @@ https://gtkmm.gnome.org/en/documentation.html
 ## Description of Project
 
 Current look of the program:
-
-https://github.com/user-attachments/assets/673f0af8-254f-4c26-97eb-26b8017a6876
+---
 
 Edit window:
 
