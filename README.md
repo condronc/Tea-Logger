@@ -22,7 +22,6 @@ Edit window:
   - *time edited not done currently*
 - Able to switch between "tabs"
 
-
 ### Planned Features/Short Goals
 - Add more and detailed fields to be entered for a tea
   - Ex: Brand, Tea Type, Personal ratings...
