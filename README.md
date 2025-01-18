@@ -22,8 +22,8 @@ Edit window:
   - *time edited not done currently*
 - Able to switch between "tabs"
 
+
 ### Planned Features/Short Goals
-- ~~Edit entries~~
 - Add more and detailed fields to be entered for a tea
   - Ex: Brand, Tea Type, Personal ratings...
 - Flavor dictionary
