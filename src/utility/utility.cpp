@@ -2,29 +2,6 @@
 
 #include <gtkmm/treeview.h>
 
-#include "../app.hpp"
-
-/// @brief connects signals for ui elements in the app class
-/// @param app the app object to conenct signals for
-void Utility::connect_signals(App& app) {
-  app.m_logButton.signal_clicked().connect(
-      sigc::mem_fun(app, &App::on_log_button_clicked));
-  app.m_deleteButton.signal_clicked().connect(
-      sigc::mem_fun(app, &App::on_delete_button_clicked));
-  app.m_searchEntry.signal_changed().connect(
-      sigc::mem_fun(app, &App::on_search_changed));
-  app.m_editButton.signal_clicked().connect(
-      sigc::mem_fun(app, &App::on_edit_button_clicked));
-
-  app.m_toggleButton.signal_clicked().connect(
-      sigc::mem_fun(app, &App::on_toggle_button_clicked));
-
-  app.m_profileButton.signal_clicked().connect(
-      sigc::mem_fun(app, &App::show_profile_content));
-  app.m_teaButton.signal_clicked().connect(
-      sigc::mem_fun(app, &App::show_tea_content));
-}
-
 /// @brief adds entries to the treeview, intended purpose is searching
 /// @param entries
 /// @param refTreeModel

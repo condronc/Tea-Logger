@@ -11,17 +11,12 @@ SQLiteDB::SQLiteDB(const std::string& db_path) {
   }
 }
 
-/// @brief Checks for connection if db is not null (only closes if a connection
-/// was made)
 SQLiteDB::~SQLiteDB() {
   if (db) {
     sqlite3_close(db);
-    db = nullptr;
   }
 }
 
-// the pointer is not const, but the method is!
-// it wont modify the db object.
 sqlite3* SQLiteDB::get() const { return db; }
 
 /// @brief Creates a database if one does not exist
@@ -37,6 +32,22 @@ TeaDatabase::TeaDatabase(const std::string& db_path) : db(db_path) {
   )");
 }
 
+sqlite3_stmt* TeaDatabase::prepare_statement(const std::string& sql) {
+  sqlite3_stmt* stmt = nullptr;
+  if (sqlite3_prepare_v2(db.get(), sql.c_str(), -1, &stmt, nullptr) !=
+      SQLITE_OK) {
+    throw std::runtime_error("SQL prepare error: " +
+                             std::string(sqlite3_errmsg(db.get())));
+  }
+  return stmt;
+}
+
+void TeaDatabase::finalize_statement(sqlite3_stmt* stmt) {
+  if (stmt) {
+    sqlite3_finalize(stmt);
+  }
+}
+
 /// @brief executes SQL against the databse - parameter binding.
 /// @param sql
 /// @param params
@@ -44,30 +55,21 @@ TeaDatabase::TeaDatabase(const std::string& db_path) : db(db_path) {
 std::vector<TeaLogEntry> TeaDatabase::execute_query(
     const std::string& sql, const std::vector<std::string>& params) {
   std::vector<TeaLogEntry> results;
-  sqlite3_stmt* stmt;
-
-  if (sqlite3_prepare_v2(db.get(), sql.c_str(), -1, &stmt, nullptr) !=
-      SQLITE_OK) {
-    std::cerr << "Prepare failed: " << sqlite3_errmsg(db.get()) << std::endl;
-    return results;
-  }
+  sqlite3_stmt* stmt = prepare_statement(sql);
 
   for (size_t i = 0; i < params.size(); ++i) {
     sqlite3_bind_text(stmt, i + 1, params[i].c_str(), -1, SQLITE_STATIC);
   }
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
-    int id = sqlite3_column_int(stmt, 0);
-    const char* tea_name = (const char*)sqlite3_column_text(stmt, 1);
-    const char* local_time = (const char*)sqlite3_column_text(stmt, 2);
-    const char* utc_time = (const char*)sqlite3_column_text(stmt, 3);
-
-    results.emplace_back(id, tea_name ? tea_name : "",
-                         local_time ? local_time : "",
-                         utc_time ? utc_time : "");
+    results.emplace_back(
+        sqlite3_column_int(stmt, 0),
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)) ?: "",
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)) ?: "",
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)) ?: "");
   }
 
-  sqlite3_finalize(stmt);
+  finalize_statement(stmt);
   return results;
 }
 
@@ -76,16 +78,13 @@ std::vector<TeaLogEntry> TeaDatabase::execute_query(
 /// @param sql
 void TeaDatabase::execute_sql(const std::string& sql) {
   char* errMessage = nullptr;
-  int return_code =
+  int result =
       sqlite3_exec(db.get(), sql.c_str(), nullptr, nullptr, &errMessage);
-  if (return_code != SQLITE_OK) {
-    std::string error_msg = "SQL execution failed: ";
-    if (errMessage) {
-      error_msg += errMessage;
-      sqlite3_free(errMessage);
-    } else {
-      error_msg += std::string(sqlite3_errmsg(db.get()));
-    }
+  if (result != SQLITE_OK) {
+    std::string error_msg =
+        "SQL execution failed: " +
+        std::string(errMessage ? errMessage : sqlite3_errmsg(db.get()));
+    sqlite3_free(errMessage);
     throw std::runtime_error(error_msg);
   }
 }
@@ -94,50 +93,51 @@ void TeaDatabase::execute_sql(const std::string& sql) {
 /// @param tea_name
 /// @return if the function fails return false, otherwise true
 bool TeaDatabase::log_tea(const std::string& tea_name) {
-  const char* sql = "INSERT INTO tea_database (tea_name) VALUES (?);";
-  sqlite3_stmt* stmt = nullptr;
-
-  if (sqlite3_prepare_v2(db.get(), sql, -1, &stmt, nullptr) != SQLITE_OK) {
-    std::cerr << "Prepare failed: " << sqlite3_errmsg(db.get()) << std::endl;
-    return false;
-  }
-
+  const std::string sql = "INSERT INTO tea_database (tea_name) VALUES (?);";
+  sqlite3_stmt* stmt = prepare_statement(sql);
   sqlite3_bind_text(stmt, 1, tea_name.c_str(), -1, SQLITE_STATIC);
 
-  if (sqlite3_step(stmt) != SQLITE_DONE) {
-    std::cerr << "Log failed: " << sqlite3_errstr(sqlite3_errcode(db.get()))
-              << std::endl;
-    sqlite3_finalize(stmt);
-    return false;
+  bool success = sqlite3_step(stmt) == SQLITE_DONE;
+  if (!success) {
+    std::cerr << "Log failed: " << sqlite3_errmsg(db.get()) << std::endl;
   }
-
-  sqlite3_finalize(stmt);
-  return true;
+  finalize_statement(stmt);
+  return success;
 }
 
 /// @brief Deletes a tea
 /// @param tea_name
 /// @return if the function fails return false, otherwise true
 bool TeaDatabase::delete_tea(const std::string& tea_name) {
-  const char* sql = "DELETE FROM tea_database WHERE tea_name = ?;";
-  sqlite3_stmt* stmt = nullptr;
-
-  if (sqlite3_prepare_v2(db.get(), sql, -1, &stmt, nullptr) != SQLITE_OK) {
-    std::cerr << "Prepare failed: " << sqlite3_errmsg(db.get()) << std::endl;
-    return false;
-  }
-
+  const std::string sql = "DELETE FROM tea_database WHERE tea_name = ?;";
+  sqlite3_stmt* stmt = prepare_statement(sql);
   sqlite3_bind_text(stmt, 1, tea_name.c_str(), -1, SQLITE_STATIC);
 
-  if (sqlite3_step(stmt) != SQLITE_DONE) {
-    std::cerr << "Delete failed: " << sqlite3_errstr(sqlite3_errcode(db.get()))
-              << std::endl;
-    sqlite3_finalize(stmt);
-    return false;
+  bool success = sqlite3_step(stmt) == SQLITE_DONE;
+  if (!success) {
+    std::cerr << "Delete failed: " << sqlite3_errmsg(db.get()) << std::endl;
   }
+  finalize_statement(stmt);
+  return success;
+}
 
-  sqlite3_finalize(stmt);
-  return true;
+/// @brief updates the database for editing
+/// @param tea_id
+/// @param new_name
+void TeaDatabase::update_tea_name(int tea_id, const std::string& new_name) {
+  try {
+    const std::string sql = "UPDATE tea_database SET tea_name = ? WHERE id = ?";
+    sqlite3_stmt* stmt = prepare_statement(sql);
+    sqlite3_bind_text(stmt, 1, new_name.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 2, tea_id);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+      throw std::runtime_error("Failed to update tea name");
+    }
+    finalize_statement(stmt);
+  } catch (const std::exception& e) {
+    std::cerr << "Error updating tea name: " << e.what() << std::endl;
+  }
 }
 
 /// @brief  finds tea entries based on the parameter
@@ -163,29 +163,4 @@ std::vector<TeaLogEntry> TeaDatabase::find_tea_entries(
     entries.push_back(entry);
   }
   return entries;
-}
-
-/// @brief updates the database for editing
-/// @param tea_id
-/// @param new_name
-void TeaDatabase::update_tea_name(int tea_id, const std::string& new_name) {
-  try {
-    sqlite3_stmt* stmt;
-    const char* query = "UPDATE tea_database SET tea_name = ? WHERE id = ?";
-    if (sqlite3_prepare_v2(db.get(), query, -1, &stmt, nullptr) != SQLITE_OK) {
-      throw std::runtime_error("Failed to prepare SQL statement");
-    }
-
-    sqlite3_bind_text(stmt, 1, new_name.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 2, tea_id);
-
-    if (sqlite3_step(stmt) != SQLITE_DONE) {
-      throw std::runtime_error("Failed to update tea name");
-    }
-
-    sqlite3_finalize(stmt);
-  } catch (const std::exception& e) {
-    std::cerr << "Error updating tea name in database: " << e.what()
-              << std::endl;
-  }
 }

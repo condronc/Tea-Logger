@@ -9,10 +9,10 @@ Gtk::Box* UiElements::create_tea_content(Gtk::Entry& entry,
                                          Gtk::Button& deleteButton,
                                          Gtk::Button& editButton,
                                          Gtk::TreeView& treeView) {
-  Gtk::Box* main_content =
-      Gtk::manage(new Gtk::Box(Gtk::Orientation::HORIZONTAL, 10));
+  auto main_content =
+      Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 10);
 
-  Gtk::Box* sidebar = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
+  auto sidebar = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 10);
   entry.set_placeholder_text("Enter tea...");
   logButton.set_label("Log Tea");
   deleteButton.set_label("Delete Tea");
@@ -27,7 +27,7 @@ Gtk::Box* UiElements::create_tea_content(Gtk::Entry& entry,
 
   main_content->append(*sidebar);
 
-  auto scrolledWindow = Gtk::manage(new Gtk::ScrolledWindow());
+  auto scrolledWindow = Gtk::make_managed<Gtk::ScrolledWindow>();
   scrolledWindow->set_expand(true);
   scrolledWindow->set_child(treeView);
 
@@ -43,8 +43,7 @@ Gtk::Box* UiElements::create_tea_content(Gtk::Entry& entry,
 /// @return a pointer to the created main box
 Gtk::Box* UiElements::create_main_box(Gtk::Box* side_panel,
                                       Gtk::Box* main_content) {
-  Gtk::Box* main_box =
-      Gtk::manage(new Gtk::Box(Gtk::Orientation::HORIZONTAL, 10));
+  auto main_box = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 10);
   main_box->set_margin(10);
   main_box->set_hexpand(true);
 
@@ -122,11 +121,9 @@ Gtk::Window* UiElements::create_edit_window(
 Gtk::Box* UiElements::create_side_panel(Gtk::Button& profileButton,
                                         Gtk::Button& cupButton,
                                         Gtk::Button& toggleButton) {
-  Gtk::Box* sidePanel =
-      Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
+  auto sidePanel = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 10);
 
   profileButton.set_image_from_icon_name("avatar-default-symbolic");
-
   cupButton.set_image_from_icon_name("emoji-nature-symbolic");
   toggleButton.set_image_from_icon_name("go-next-symbolic");
 
@@ -155,8 +152,9 @@ void UiElements::toggle_side_panel(Gtk::Box& side_panel,
 }
 
 Gtk::Box* UiElements::create_profile_content() {
-  Gtk::Box* profile_content = new Gtk::Box(Gtk::Orientation::VERTICAL);
-  Gtk::Label* label = new Gtk::Label("This is a test profile content.");
+  auto profile_content =
+      Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL);
+  auto label = Gtk::make_managed<Gtk::Label>("This is a test profile content.");
   profile_content->append(*label);
   return profile_content;
 }

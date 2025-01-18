@@ -1,11 +1,16 @@
 #include <gtkmm/application.h>
 
-#include "app.hpp"
+#include <iostream>
 
+#include "app.hpp"
 // Reference from Gtkmm
 int main(int argc, char* argv[]) {
-  auto app = Gtk::Application::create("org.gtkmm.example");
+  try {
+    auto app = Gtk::Application::create("tea.logger");
 
-  // Shows the window and returns when it is closed.
-  return app->make_window_and_run<App>(argc, argv);
+    return app->make_window_and_run<App>(argc, argv);
+  } catch (const std::exception& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    return 1;
+  }
 }

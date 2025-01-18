@@ -29,10 +29,6 @@ class UiElements {
                               Gtk::Button& cupButton,
                               Gtk::Button& toggleButton);
 
-  Gtk::Box* create_sidebar(Gtk::Entry& entry, Gtk::SearchEntry& searchEntry,
-                           Gtk::Button& logButton, Gtk::Button& deleteButtonm,
-                           Gtk::Button& editButton);
-
   Gtk::Box* create_tea_content(Gtk::Entry& entry, Gtk::SearchEntry& searchEntry,
                                Gtk::Button& logButton,
                                Gtk::Button& deleteButton,
