@@ -3,44 +3,36 @@
 /// @brief default constructor
 UiElements::UiElements() {}
 
-/// @brief creates a vertical box for containing sidebar elements
-/// @param entry
-/// @param searchEntry
-/// @param logButton
-/// @param deleteButton
-/// @return pointer to the created sidebar
-Gtk::Box* UiElements::create_sidebar(Gtk::Entry& entry,
-                                     Gtk::SearchEntry& searchEntry,
-                                     Gtk::Button& logButton,
-                                     Gtk::Button& deleteButton,
-                                     Gtk::Button& editButton) {
+Gtk::Box* UiElements::create_tea_content(Gtk::Entry& entry,
+                                         Gtk::SearchEntry& searchEntry,
+                                         Gtk::Button& logButton,
+                                         Gtk::Button& deleteButton,
+                                         Gtk::Button& editButton,
+                                         Gtk::TreeView& treeView) {
+  Gtk::Box* main_content =
+      Gtk::manage(new Gtk::Box(Gtk::Orientation::HORIZONTAL, 10));
+
   Gtk::Box* sidebar = Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
   entry.set_placeholder_text("Enter tea...");
   logButton.set_label("Log Tea");
   deleteButton.set_label("Delete Tea");
   editButton.set_label("Edit tea");
   searchEntry.set_placeholder_text("Search tea...");
+
   sidebar->append(entry);
   sidebar->append(searchEntry);
   sidebar->append(logButton);
   sidebar->append(deleteButton);
   sidebar->append(editButton);
 
-  return sidebar;
-}
-
-/// @brief creates the main content area containing the tree view
-/// @param treeView
-/// @return pointer to the created main content
-Gtk::Box* UiElements::create_main_content(Gtk::TreeView& treeView) {
-  Gtk::Box* main_content =
-      Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
+  main_content->append(*sidebar);
 
   auto scrolledWindow = Gtk::manage(new Gtk::ScrolledWindow());
   scrolledWindow->set_expand(true);
   scrolledWindow->set_child(treeView);
 
   main_content->append(*scrolledWindow);
+
   return main_content;
 }
 
@@ -49,19 +41,17 @@ Gtk::Box* UiElements::create_main_content(Gtk::TreeView& treeView) {
 /// @param sidebar
 /// @param main_content
 /// @return a pointer to the created main box
-Gtk::Box* UiElements::create_main_box(Gtk::Box* side_panel, Gtk::Box* sidebar,
+Gtk::Box* UiElements::create_main_box(Gtk::Box* side_panel,
                                       Gtk::Box* main_content) {
   Gtk::Box* main_box =
       Gtk::manage(new Gtk::Box(Gtk::Orientation::HORIZONTAL, 10));
   main_box->set_margin(10);
   main_box->set_hexpand(true);
 
-  sidebar->set_hexpand(false);
   main_content->set_hexpand(true);
   main_content->set_vexpand(true);
 
   main_box->append(*side_panel);
-  main_box->append(*sidebar);
   main_box->append(*main_content);
   return main_box;
 }
@@ -162,4 +152,11 @@ void UiElements::toggle_side_panel(Gtk::Box& side_panel,
     toggle_button.set_icon_name("go-previous-symbolic");
   }
   is_expanded = !is_expanded;
+}
+
+Gtk::Box* UiElements::create_profile_content() {
+  Gtk::Box* profile_content = new Gtk::Box(Gtk::Orientation::VERTICAL);
+  Gtk::Label* label = new Gtk::Label("This is a test profile content.");
+  profile_content->append(*label);
+  return profile_content;
 }

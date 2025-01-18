@@ -18,6 +18,11 @@ void Utility::connect_signals(App& app) {
 
   app.m_toggleButton.signal_clicked().connect(
       sigc::mem_fun(app, &App::on_toggle_button_clicked));
+
+  app.m_profileButton.signal_clicked().connect(
+      sigc::mem_fun(app, &App::show_profile_content));
+  app.m_teaButton.signal_clicked().connect(
+      sigc::mem_fun(app, &App::show_tea_content));
 }
 
 /// @brief adds entries to the treeview, intended purpose is searching

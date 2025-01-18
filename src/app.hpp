@@ -21,12 +21,13 @@ class App : public Gtk::Window {
  protected:
   TeaDatabase teadatabase;
 
-  // Adds tea entries to the treeview model.
-  // void AddEntriesToTree(const std::vector<TeaLogEntry>& entries);
-
+  Gtk::Box* current_content = nullptr;
+  bool is_tea_content_shown = true;
   void on_toggle_button_clicked();
   void on_log_button_clicked();
   void on_edit_button_clicked();
+  void show_tea_content();
+  void show_profile_content();
   void on_search_changed();
   void on_delete_button_clicked();
 
@@ -36,6 +37,8 @@ class App : public Gtk::Window {
   Gtk::Box* m_sidePanel;
   Gtk::Box* m_teaContent;
   Gtk::Box* m_profileContent;
+  Gtk::Box* m_current_main_content;
+  void replace_main_content(Gtk::Box* new_content);
 
   Gtk::Button m_logButton, m_deleteButton, m_editButton, m_profileButton,
       m_teaButton, m_toggleButton;

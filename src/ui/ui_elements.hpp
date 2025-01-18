@@ -20,6 +20,8 @@ class UiElements {
  public:
   UiElements();
 
+  Gtk::Box* create_profile_content();
+
   void toggle_side_panel(Gtk::Box& side_panel, Gtk::Button& toggle_button,
                          bool& is_expanded);
 
@@ -31,10 +33,13 @@ class UiElements {
                            Gtk::Button& logButton, Gtk::Button& deleteButtonm,
                            Gtk::Button& editButton);
 
-  Gtk::Box* create_main_content(Gtk::TreeView& treeView);
+  Gtk::Box* create_tea_content(Gtk::Entry& entry, Gtk::SearchEntry& searchEntry,
+                               Gtk::Button& logButton,
+                               Gtk::Button& deleteButton,
+                               Gtk::Button& editButton,
+                               Gtk::TreeView& treeView);
 
-  Gtk::Box* create_main_box(Gtk::Box* side_panel, Gtk::Box* sidebar,
-                            Gtk::Box* main_content);
+  Gtk::Box* create_main_box(Gtk::Box* side_panel, Gtk::Box* main_content);
 
   Gtk::Window* create_edit_window(
       const std::string& tea_name,

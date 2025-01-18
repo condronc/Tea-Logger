@@ -1,6 +1,7 @@
 #include "app.hpp"
 
 #include <gdkmm/display.h>
+#include <glibmm.h>
 #include <gtkmm.h>
 #include <gtkmm/box.h>
 #include <gtkmm/cssprovider.h>
@@ -40,20 +41,15 @@ App::App() : teadatabase("tea_database.db"), m_isPanelExpanded(false) {
 
   ui_elements.setup_treeview(m_treeView, m_refTreeModel, m_colID, m_colName,
                              m_colLocal, m_colUtc);
-  // creates ui elements
-  Gtk::Box* sidebar = ui_elements.create_sidebar(
-      m_entry, m_searchEntry, m_logButton, m_deleteButton, m_editButton);
-  Gtk::Box* main_content = ui_elements.create_main_content(m_treeView);
-  Gtk::Box* main_box =
-      ui_elements.create_main_box(m_sidePanel, sidebar, main_content);
 
-  // sets up layout
+  Gtk::Box* tea_content =
+      ui_elements.create_tea_content(m_entry, m_searchEntry, m_logButton,
+                                     m_deleteButton, m_editButton, m_treeView);
+
+  Gtk::Box* main_box = ui_elements.create_main_box(m_sidePanel, tea_content);
+
   UiLayout::arrange_layout(*this, main_box);
-
-  // connect signals
   Utility::connect_signals(*this);
-
-  // populate the tree view with all tea entries shown
   PopulateTreeview("");
 }
 
@@ -108,7 +104,7 @@ void App::on_edit_button_clicked() {
         if (!new_tea_name.empty() && new_tea_name != tea_name) {
           try {
             teadatabase.update_tea_name(tea_id, new_tea_name);
-            PopulateTreeview();  // Refresh the tree view after update
+            PopulateTreeview();
           } catch (const std::exception& e) {
             std::cerr << "Error updating tea name: " << e.what() << std::endl;
           }
@@ -144,4 +140,50 @@ void App::on_toggle_button_clicked() {
   UiElements ui_elements;
   ui_elements.toggle_side_panel(*m_sidePanel, m_toggleButton,
                                 m_isPanelExpanded);
+}
+
+void App::replace_main_content(Gtk::Box* new_content) {
+  Gtk::Box* main_box = dynamic_cast<Gtk::Box*>(get_children().front());
+
+  if (!main_box) {
+    std::cerr << "Error: Main box not found." << std::endl;
+    return;
+  }
+
+  if (main_box->get_children().empty()) {
+    std::cerr << "Error: No child widget found in the main box." << std::endl;
+    return;
+  }
+
+  Gtk::Widget* old_content_ptr = main_box->get_children().back();
+
+  main_box->remove(*old_content_ptr);
+
+  main_box->append(*new_content);
+}
+
+void App::show_tea_content() {
+  if (is_tea_content_shown) {
+    return;
+  }
+  UiElements ui_elements;
+  Gtk::Box* tea_content =
+      ui_elements.create_tea_content(m_entry, m_searchEntry, m_logButton,
+                                     m_deleteButton, m_editButton, m_treeView);
+
+  replace_main_content(tea_content);
+
+  current_content = tea_content;
+  is_tea_content_shown = true;
+}
+
+void App::show_profile_content() {
+  UiElements ui_elements;
+
+  Gtk::Box* profile_content = ui_elements.create_profile_content();
+  if (current_content != profile_content) {
+    replace_main_content(profile_content);
+    current_content = profile_content;
+    is_tea_content_shown = false;
+  }
 }
