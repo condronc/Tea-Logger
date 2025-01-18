@@ -10,7 +10,7 @@ https://gtkmm.gnome.org/en/documentation.html
 
 Current look of the program:
 
-![alt text](data/01172025-2.mp4)
+https://github.com/user-attachments/assets/673f0af8-254f-4c26-97eb-26b8017a6876
 
 Edit window:
 
