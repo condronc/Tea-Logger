@@ -26,3 +26,33 @@ searchentry {
 treeview {
   font-size: 14px;
 }
+
+
+.side-panel {
+  min-width: 0;
+  transition: min-width 0.3s ease, margin-left 0.3s ease;
+  background-color: #333;
+  padding: 10px;
+  min-width: 50px;
+}
+
+.side-panel.expanded {
+  min-width: 250px;
+}
+
+.main-content {
+  transition: margin-left 0.3s ease; 
+}
+
+.side-panel.expanded + .main-content {
+  margin-left: 250px;
+}
+
+
+.side-panel.collapsed {
+  min-width: 50px;
+}
+
+side-panel.collapsed + .main-content {
+  margin-left: -250px;
+}

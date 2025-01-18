@@ -49,7 +49,7 @@ Gtk::Box* UiElements::create_main_content(Gtk::TreeView& treeView) {
 /// @param sidebar
 /// @param main_content
 /// @return a pointer to the created main box
-Gtk::Box* UiElements::create_main_box(Gtk::Box* sidebar,
+Gtk::Box* UiElements::create_main_box(Gtk::Box* side_panel, Gtk::Box* sidebar,
                                       Gtk::Box* main_content) {
   Gtk::Box* main_box =
       Gtk::manage(new Gtk::Box(Gtk::Orientation::HORIZONTAL, 10));
@@ -60,6 +60,7 @@ Gtk::Box* UiElements::create_main_box(Gtk::Box* sidebar,
   main_content->set_hexpand(true);
   main_content->set_vexpand(true);
 
+  main_box->append(*side_panel);
   main_box->append(*sidebar);
   main_box->append(*main_content);
   return main_box;
@@ -126,4 +127,39 @@ Gtk::Window* UiElements::create_edit_window(
   hbox->append(*save_button);
 
   return edit_window;
+}
+
+Gtk::Box* UiElements::create_side_panel(Gtk::Button& profileButton,
+                                        Gtk::Button& cupButton,
+                                        Gtk::Button& toggleButton) {
+  Gtk::Box* sidePanel =
+      Gtk::manage(new Gtk::Box(Gtk::Orientation::VERTICAL, 10));
+
+  profileButton.set_image_from_icon_name("avatar-default-symbolic");
+
+  cupButton.set_image_from_icon_name("emoji-nature-symbolic");
+  toggleButton.set_image_from_icon_name("go-next-symbolic");
+
+  sidePanel->append(profileButton);
+  sidePanel->append(cupButton);
+  sidePanel->append(toggleButton);
+
+  return sidePanel;
+}
+
+void UiElements::toggle_side_panel(Gtk::Box& side_panel,
+                                   Gtk::Button& toggle_button,
+                                   bool& is_expanded) {
+  side_panel.get_style_context()->add_class("side-panel");
+
+  if (is_expanded) {
+    side_panel.get_style_context()->remove_class("expanded");
+    side_panel.get_style_context()->add_class("collapsed");
+    toggle_button.set_icon_name("go-next-symbolic");
+  } else {
+    side_panel.get_style_context()->remove_class("collapsed");
+    side_panel.get_style_context()->add_class("expanded");
+    toggle_button.set_icon_name("go-previous-symbolic");
+  }
+  is_expanded = !is_expanded;
 }

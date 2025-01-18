@@ -21,19 +21,23 @@
 App::~App() = default;
 
 /// @brief constructor for the application
-App::App() : teadatabase("tea_database.db") {
+App::App() : teadatabase("tea_database.db"), m_isPanelExpanded(true) {
   // injects css
   UiStyle::initialize_styling();
 
   UiElements ui_elements;
-  // sets up the tree view
+
+  m_sidePanel = ui_elements.create_side_panel(m_profileButton, m_cupButton,
+                                              m_toggleButton);
+
   ui_elements.setup_treeview(m_treeView, m_refTreeModel, m_colID, m_colName,
                              m_colLocal, m_colUtc);
   // creates ui elements
   Gtk::Box* sidebar = ui_elements.create_sidebar(
       m_entry, m_searchEntry, m_logButton, m_deleteButton, m_editButton);
   Gtk::Box* main_content = ui_elements.create_main_content(m_treeView);
-  Gtk::Box* main_box = ui_elements.create_main_box(sidebar, main_content);
+  Gtk::Box* main_box =
+      ui_elements.create_main_box(m_sidePanel, sidebar, main_content);
 
   // sets up layout
   UiLayout::arrange_layout(*this, main_box);
@@ -126,4 +130,10 @@ void App::on_search_changed() {
   } else {
     PopulateTreeview(search_Term);
   }
+}
+
+void App::on_toggle_button_clicked() {
+  UiElements ui_elements;
+  ui_elements.toggle_side_panel(*m_sidePanel, m_toggleButton,
+                                m_isPanelExpanded);
 }

@@ -1,9 +1,11 @@
 #ifndef UI_ELEMENTS_HPP
 #define UI_ELEMENTS_HPP
 
+#include <glibmm.h>
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/entry.h>
+#include <gtkmm/image.h>
 #include <gtkmm/label.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/scrolledwindow.h>
@@ -18,13 +20,21 @@ class UiElements {
  public:
   UiElements();
 
+  void toggle_side_panel(Gtk::Box& side_panel, Gtk::Button& toggle_button,
+                         bool& is_expanded);
+
+  Gtk::Box* create_side_panel(Gtk::Button& profileButton,
+                              Gtk::Button& cupButton,
+                              Gtk::Button& toggleButton);
+
   Gtk::Box* create_sidebar(Gtk::Entry& entry, Gtk::SearchEntry& searchEntry,
                            Gtk::Button& logButton, Gtk::Button& deleteButtonm,
                            Gtk::Button& editButton);
 
   Gtk::Box* create_main_content(Gtk::TreeView& treeView);
 
-  Gtk::Box* create_main_box(Gtk::Box* sidebar, Gtk::Box* main_content);
+  Gtk::Box* create_main_box(Gtk::Box* side_panel, Gtk::Box* sidebar,
+                            Gtk::Box* main_content);
 
   Gtk::Window* create_edit_window(
       const std::string& tea_name,

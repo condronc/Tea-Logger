@@ -2,6 +2,7 @@
 #define APP_HPP
 
 #include <glibmm/refptr.h>
+#include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/liststore.h>
@@ -23,6 +24,7 @@ class App : public Gtk::Window {
   // Adds tea entries to the treeview model.
   // void AddEntriesToTree(const std::vector<TeaLogEntry>& entries);
 
+  void on_toggle_button_clicked();
   void on_log_button_clicked();
   void on_edit_button_clicked();
   void on_search_changed();
@@ -30,8 +32,13 @@ class App : public Gtk::Window {
   void PopulateTreeview(const std::string& searchTerm = "");
 
   friend class Utility;
+  Gtk::Box* m_sidePanel;
 
-  Gtk::Button m_logButton, m_deleteButton, m_editButton;
+  Gtk::Button m_logButton, m_deleteButton, m_editButton, m_profileButton,
+      m_cupButton, m_toggleButton;
+
+  bool m_isPanelExpanded = true;
+
   Gtk::SearchEntry m_searchEntry;
   Gtk::Entry m_entry;
 
