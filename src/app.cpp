@@ -21,14 +21,22 @@
 App::~App() = default;
 
 /// @brief constructor for the application
-App::App() : teadatabase("tea_database.db"), m_isPanelExpanded(true) {
+App::App() : teadatabase("tea_database.db"), m_isPanelExpanded(false) {
   // injects css
   UiStyle::initialize_styling();
 
   UiElements ui_elements;
 
-  m_sidePanel = ui_elements.create_side_panel(m_profileButton, m_cupButton,
+  m_sidePanel = ui_elements.create_side_panel(m_profileButton, m_teaButton,
                                               m_toggleButton);
+
+  m_sidePanel->get_style_context()->add_class("side-panel");
+
+  if (m_isPanelExpanded) {
+    m_sidePanel->get_style_context()->add_class("expanded");
+  } else {
+    m_sidePanel->get_style_context()->add_class("collapsed");
+  }
 
   ui_elements.setup_treeview(m_treeView, m_refTreeModel, m_colID, m_colName,
                              m_colLocal, m_colUtc);

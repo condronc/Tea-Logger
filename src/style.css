@@ -27,9 +27,8 @@ treeview {
   font-size: 14px;
 }
 
-
 .side-panel {
-  min-width: 0;
+  min-width: 50px;
   transition: min-width 0.3s ease, margin-left 0.3s ease;
   background-color: #333;
   padding: 10px;
@@ -53,6 +52,6 @@ treeview {
   min-width: 50px;
 }
 
-side-panel.collapsed + .main-content {
+.side-panel.collapsed + .main-content {
   margin-left: -250px;
 }

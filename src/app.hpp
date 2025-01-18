@@ -29,13 +29,16 @@ class App : public Gtk::Window {
   void on_edit_button_clicked();
   void on_search_changed();
   void on_delete_button_clicked();
+
   void PopulateTreeview(const std::string& searchTerm = "");
 
   friend class Utility;
   Gtk::Box* m_sidePanel;
+  Gtk::Box* m_teaContent;
+  Gtk::Box* m_profileContent;
 
   Gtk::Button m_logButton, m_deleteButton, m_editButton, m_profileButton,
-      m_cupButton, m_toggleButton;
+      m_teaButton, m_toggleButton;
 
   bool m_isPanelExpanded = true;
 
