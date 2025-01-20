@@ -39,7 +39,7 @@ class App : public Gtk::Window {
   Gtk::Button m_logButton, m_deleteButton, m_editButton, m_profileButton,
       m_teaButton, m_toggleButton;
 
-  bool m_isPanelExpanded = true;
+  bool m_isPanelExpanded = false;
 
   Gtk::SearchEntry m_searchEntry;
   Gtk::Entry m_entry;

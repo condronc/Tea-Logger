@@ -1,5 +1,7 @@
 #include "ui_elements.hpp"
 
+#include <iostream>
+
 /// @brief default constructor
 UiElements::UiElements() {}
 
@@ -12,11 +14,12 @@ Gtk::Box* UiElements::create_tea_content(Gtk::Entry& entry,
   auto main_content =
       Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 10);
 
+  // Create sidebar
   auto sidebar = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 10);
   entry.set_placeholder_text("Enter tea...");
   logButton.set_label("Log Tea");
   deleteButton.set_label("Delete Tea");
-  editButton.set_label("Edit tea");
+  editButton.set_label("Edit tea...");
   searchEntry.set_placeholder_text("Search tea...");
 
   sidebar->append(entry);
@@ -36,11 +39,6 @@ Gtk::Box* UiElements::create_tea_content(Gtk::Entry& entry,
   return main_content;
 }
 
-/// @brief creates the main horizontal box containing the sidebar and main
-/// content
-/// @param sidebar
-/// @param main_content
-/// @return a pointer to the created main box
 Gtk::Box* UiElements::create_main_box(Gtk::Box* side_panel,
                                       Gtk::Box* main_content) {
   auto main_box = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 10);
@@ -52,16 +50,10 @@ Gtk::Box* UiElements::create_main_box(Gtk::Box* side_panel,
 
   main_box->append(*side_panel);
   main_box->append(*main_content);
+
   return main_box;
 }
 
-/// @brief sets up the tree view with columns and the refmodel
-/// @param treeView
-/// @param refTreeModel
-/// @param colID
-/// @param colName
-/// @param colLocal
-/// @param colUtc
 void UiElements::setup_treeview(Gtk::TreeView& treeView,
                                 Glib::RefPtr<Gtk::ListStore>& refTreeModel,
                                 Gtk::TreeModelColumn<int>& colID,
@@ -74,7 +66,6 @@ void UiElements::setup_treeview(Gtk::TreeView& treeView,
   m_Columns.add(colUtc);
 
   refTreeModel = Gtk::ListStore::create(m_Columns);
-
   treeView.set_model(refTreeModel);
 
   treeView.append_column("ID", colID);
@@ -123,9 +114,51 @@ Gtk::Box* UiElements::create_side_panel(Gtk::Button& profileButton,
                                         Gtk::Button& toggleButton) {
   auto sidePanel = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 10);
 
-  profileButton.set_image_from_icon_name("avatar-default-symbolic");
-  cupButton.set_image_from_icon_name("emoji-nature-symbolic");
-  toggleButton.set_image_from_icon_name("go-next-symbolic");
+  // Profile Button
+  auto profileBox =
+      Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 5);
+  auto profileIcon = Gtk::make_managed<Gtk::Image>("avatar-default-symbolic");
+  profileIcon->set_from_icon_name("avatar-default-symbolic");
+  auto profileLabel = Gtk::make_managed<Gtk::Label>("Profile");
+
+  profileBox->append(*profileIcon);
+  profileBox->append(*profileLabel);
+  profileButton.set_child(*profileBox);
+
+  profileBox->set_halign(Gtk::Align::CENTER);
+  profileBox->set_valign(Gtk::Align::CENTER);
+
+  profileLabel->set_visible(false);
+
+  // Tea Button
+  auto teaBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 5);
+  auto teaIcon = Gtk::make_managed<Gtk::Image>("emoji-nature-symbolic");
+  teaIcon->set_from_icon_name("emoji-nature-symbolic");
+  auto teaLabel = Gtk::make_managed<Gtk::Label>("Tea");
+
+  teaBox->append(*teaIcon);
+  teaBox->append(*teaLabel);
+  cupButton.set_child(*teaBox);
+
+  teaBox->set_halign(Gtk::Align::CENTER);
+  teaBox->set_valign(Gtk::Align::CENTER);
+
+  teaLabel->set_visible(false);
+
+  // Toggle Button
+  auto toggleBox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 5);
+  auto toggleIcon = Gtk::make_managed<Gtk::Image>("go-next-symbolic");
+  toggleIcon->set_from_icon_name("go-next-symbolic");
+  auto toggleLabel = Gtk::make_managed<Gtk::Label>("Toggle");
+
+  toggleBox->append(*toggleIcon);
+  toggleBox->append(*toggleLabel);
+  toggleButton.set_child(*toggleBox);
+
+  toggleBox->set_halign(Gtk::Align::CENTER);
+  toggleBox->set_valign(Gtk::Align::CENTER);
+
+  toggleLabel->set_visible(false);
 
   sidePanel->append(profileButton);
   sidePanel->append(cupButton);
@@ -137,16 +170,40 @@ Gtk::Box* UiElements::create_side_panel(Gtk::Button& profileButton,
 void UiElements::toggle_side_panel(Gtk::Box& side_panel,
                                    Gtk::Button& toggle_button,
                                    bool& is_expanded) {
-  side_panel.get_style_context()->add_class("side-panel");
-
   if (is_expanded) {
     side_panel.get_style_context()->remove_class("expanded");
     side_panel.get_style_context()->add_class("collapsed");
     toggle_button.set_icon_name("go-next-symbolic");
+
+    for (auto* child : side_panel.get_children()) {
+      if (auto* button = dynamic_cast<Gtk::Button*>(child)) {
+        for (auto* button_child : button->get_children()) {
+          if (auto* box = dynamic_cast<Gtk::Box*>(button_child)) {
+            if (auto* label =
+                    dynamic_cast<Gtk::Label*>(box->get_children().back())) {
+              label->set_visible(false);
+            }
+          }
+        }
+      }
+    }
   } else {
     side_panel.get_style_context()->remove_class("collapsed");
     side_panel.get_style_context()->add_class("expanded");
     toggle_button.set_icon_name("go-previous-symbolic");
+
+    for (auto* child : side_panel.get_children()) {
+      if (auto* button = dynamic_cast<Gtk::Button*>(child)) {
+        for (auto* button_child : button->get_children()) {
+          if (auto* box = dynamic_cast<Gtk::Box*>(button_child)) {
+            if (auto* label =
+                    dynamic_cast<Gtk::Label*>(box->get_children().back())) {
+              label->set_visible(true);
+            }
+          }
+        }
+      }
+    }
   }
   is_expanded = !is_expanded;
 }
