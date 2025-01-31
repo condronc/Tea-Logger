@@ -32,19 +32,3 @@ void App::on_activate() {
     std::cerr << e.what() << std::endl;
   }
 }
-
-void App::on_open(const Gio::Application::type_vec_files& files,
-                  const Glib::ustring& hint) {
-  AppWindow* appwindow = nullptr;
-  auto windows = get_windows();
-  if (windows.size() > 0) {
-    appwindow = dynamic_cast<AppWindow*>(windows[0]);
-  }
-  if (!appwindow) {
-    appwindow = create_appwindow();
-  }
-  for (const auto& file : files) {
-    appwindow->open_file_view(file);
-  }
-  appwindow->present();
-}

@@ -4,7 +4,8 @@ AppWindow::AppWindow()
     : m_mainPaned(Gtk::Orientation::HORIZONTAL),
       m_sidebarBox(Gtk::Orientation::VERTICAL),
       m_profileButton("Profile"),
-      m_teaButton("Tea Log") {
+      m_teaButton("Tea Log"),
+      m_teaList() {
   set_title("Tea Logger");
   set_default_size(800, 600);
 
@@ -19,6 +20,8 @@ AppWindow::AppWindow()
 
   set_child(m_mainPaned);
 
+  on_tea_button_clicked();
+
   m_profileButton.signal_clicked().connect(
       sigc::mem_fun(*this, &AppWindow::on_profile_button_clicked));
   m_teaButton.signal_clicked().connect(
@@ -31,5 +34,3 @@ void AppWindow::on_profile_button_clicked() {
 }
 
 void AppWindow::on_tea_button_clicked() { m_contentArea.set_child(m_teaList); }
-
-void AppWindow::open_file_view(const Glib::RefPtr<Gio::File>& /* file */) {}

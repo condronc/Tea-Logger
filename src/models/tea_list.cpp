@@ -5,50 +5,79 @@ TeaList::TeaList()
       m_listStore(Gio::ListStore<TeaEntry>::create()),
       m_selectionModel(Gtk::SingleSelection::create(m_listStore)) {
   setup_columns();
+  load_tea_entries();
 
+  m_columnView.set_vexpand(true);
+  m_columnView.set_hexpand(true);
   m_columnView.set_model(m_selectionModel);
+
   m_scrolledWindow.set_child(m_columnView);
   m_scrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC,
                               Gtk::PolicyType::AUTOMATIC);
+  m_scrolledWindow.set_vexpand(true);
   append(m_scrolledWindow);
 }
 
 void TeaList::setup_columns() {
-  auto name_factory =
-      create_factory([](const Glib::RefPtr<Gtk::ListItem>& list_item) {
+  auto name_factory = Gtk::SignalListItemFactory::create();
+  name_factory->signal_setup().connect(
+      [](const Glib::RefPtr<Gtk::ListItem>& list_item) {
+        auto label = Gtk::make_managed<Gtk::Label>("");
+        list_item->set_child(*label);
+      });
+
+  name_factory->signal_bind().connect(
+      [](const Glib::RefPtr<Gtk::ListItem>& list_item) {
         auto item = std::dynamic_pointer_cast<TeaEntry>(list_item->get_item());
         if (item) {
-          auto label = Gtk::make_managed<Gtk::Label>(item->get_name());
-          list_item->set_child(*label);
+          auto label = dynamic_cast<Gtk::Label*>(list_item->get_child());
+          if (label) {
+            label->set_text(item->get_tea_name());
+          }
         }
       });
 
-  auto date_factory =
-      create_factory([](const Glib::RefPtr<Gtk::ListItem>& list_item) {
+  auto date_factory = Gtk::SignalListItemFactory::create();
+  date_factory->signal_setup().connect(
+      [](const Glib::RefPtr<Gtk::ListItem>& list_item) {
+        auto label = Gtk::make_managed<Gtk::Label>("");
+        list_item->set_child(*label);
+      });
+
+  date_factory->signal_bind().connect(
+      [](const Glib::RefPtr<Gtk::ListItem>& list_item) {
         auto item = std::dynamic_pointer_cast<TeaEntry>(list_item->get_item());
         if (item) {
-          auto label = Gtk::make_managed<Gtk::Label>(item->get_date());
-          list_item->set_child(*label);
+          auto label = dynamic_cast<Gtk::Label*>(list_item->get_child());
+          if (label) {
+            label->set_text(item->get_local_time());
+          }
         }
       });
 
   auto name_column = Gtk::ColumnViewColumn::create("Tea Name", name_factory);
   auto date_column = Gtk::ColumnViewColumn::create("Date Logged", date_factory);
-
+  name_column->set_expand(true);
+  date_column->set_expand(true);
   m_columnView.append_column(name_column);
   m_columnView.append_column(date_column);
 }
 
-void TeaList::add_tea(int id, const Glib::ustring& name,
-                      const Glib::ustring& date) {
-  auto tea_entry =
-      Glib::make_refptr_for_instance<TeaEntry>(new TeaEntry(id, name, date));
-  m_listStore->append(tea_entry);
+void TeaList::load_tea_entries() {
+  m_listStore->splice(0, m_listStore->get_n_items(), {});
+
+  std::vector<Glib::RefPtr<TeaEntry>> test_entries = {
+      TeaEntry::create(1, "Green Tea", "2025-01-31 12:00"),
+      TeaEntry::create(2, "Black Tea", "2025-01-31 13:00"),
+      TeaEntry::create(3, "Oolong Tea", "2025-01-31 14:00")};
+
+  if (!test_entries.empty()) {
+    m_listStore->splice(m_listStore->get_n_items(), 0, test_entries);
+  }
 }
 
-Glib::RefPtr<Gtk::SignalListItemFactory> TeaList::create_factory(
-    std::function<void(const Glib::RefPtr<Gtk::ListItem>&)> bind_func) {
-  auto factory = Gtk::SignalListItemFactory::create();
-  factory->signal_bind().connect(bind_func);
-  return factory;
+void TeaList::add_tea(const Glib::ustring& name) {
+  int new_id = m_listStore->get_n_items() + 1;
+  auto new_entry = TeaEntry::create(new_id, name, "2025-02-03");
+  m_listStore->append(new_entry);
 }

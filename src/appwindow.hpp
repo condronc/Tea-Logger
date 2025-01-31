@@ -9,8 +9,6 @@ class AppWindow : public Gtk::ApplicationWindow {
  public:
   AppWindow();
 
-  void open_file_view(const Glib::RefPtr<Gio::File>& file);
-
  private:
   Gtk::Paned m_mainPaned;
   Gtk::Box m_sidebarBox;
