@@ -1,66 +1,24 @@
 #ifndef APP_HPP
 #define APP_HPP
 
-#include <glibmm/refptr.h>
-#include <gtkmm/box.h>
-#include <gtkmm/button.h>
-#include <gtkmm/entry.h>
-#include <gtkmm/liststore.h>
-#include <gtkmm/searchentry.h>
-#include <gtkmm/treeview.h>
-#include <gtkmm/window.h>
-#include <sqlite3.h>
+#include <gtkmm.h>
 
-#include "db/db_handler.hpp"
-#include "ui/ui_elements.hpp"
-#include "ui/ui_layout.hpp"
-#include "ui/ui_style.hpp"
-#include "utility/utility.hpp"
+class AppWindow;
 
-class App : public Gtk::Window {
- public:
+class App : public Gtk::Application {
+ protected:
   App();
-  ~App() override;
+
+ public:
+  static Glib::RefPtr<App> create();
 
  protected:
-  TeaDatabase teadatabase;
-  UiElements ui_elements;
-  Utility utility;
-  UiLayout ui_layout;
-  UiStyle ui_style;
+  void on_activate() override;
+  void on_open(const Gio::Application::type_vec_files& files,
+               const Glib::ustring& hint) override;
 
-  Gtk::Box* current_content = nullptr;
-  bool is_tea_content_shown = true;
-
-  Gtk::Box* m_sidePanel;
-  Gtk::Box* m_current_main_content;
-  void replace_main_content(Gtk::Box* new_content);
-
-  Gtk::Button m_logButton, m_deleteButton, m_editButton, m_profileButton,
-      m_teaButton, m_toggleButton;
-
-  bool m_isPanelExpanded = false;
-
-  Gtk::SearchEntry m_searchEntry;
-  Gtk::Entry m_entry;
-
-  Gtk::TreeView m_treeView;
-  Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
-
-  Gtk::TreeModelColumn<int> m_colID;
-  Gtk::TreeModelColumn<std::string> m_colName, m_colLocal, m_colUtc;
-
-  Gtk::TreeModelColumnRecord m_Columns;
-
-  void on_toggle_button_clicked();
-  void on_log_button_clicked();
-  void on_edit_button_clicked();
-  void show_tea_content();
-  void show_profile_content();
-  void on_search_changed();
-  void on_delete_button_clicked();
-  void PopulateTreeview(const std::string& searchTerm = "");
-  void connect_signals();
+ private:
+  AppWindow* create_appwindow();
 };
 
 #endif
