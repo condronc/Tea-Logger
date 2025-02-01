@@ -10,9 +10,11 @@
 
 App::App()
     : Gtk::Application("tea.logger", Gio::Application::Flags::HANDLES_OPEN) {}
+
 Glib::RefPtr<App> App::create() {
   return Glib::make_refptr_for_instance<App>(new App());
 }
+
 AppWindow* App::create_appwindow() {
   auto appwindow = Gtk::make_managed<AppWindow>();
   add_window(*appwindow);

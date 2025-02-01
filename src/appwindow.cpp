@@ -1,31 +1,18 @@
 #include "appwindow.hpp"
 
-AppWindow::AppWindow()
-    : m_mainPaned(Gtk::Orientation::HORIZONTAL),
-      m_sidebarBox(Gtk::Orientation::VERTICAL),
-      m_profileButton("Profile"),
-      m_teaButton("Tea Log"),
-      m_teaList() {
-  set_title("Tea Logger");
-  set_default_size(800, 600);
+AppWindow::AppWindow() {
+  Helper::initialize_window(*this);
 
   m_sidebarBox.append(m_profileButton);
   m_sidebarBox.append(m_teaButton);
 
-  m_contentArea.set_policy(Gtk::PolicyType::AUTOMATIC,
-                           Gtk::PolicyType::AUTOMATIC);
-  m_mainPaned.set_start_child(m_sidebarBox);
-  m_mainPaned.set_end_child(m_contentArea);
-  m_mainPaned.set_position(200);
-
+  Helper::setup_layout(m_mainPaned, m_sidebarBox, m_contentArea);
   set_child(m_mainPaned);
 
-  on_tea_button_clicked();
+  m_contentArea.set_child(m_teaList);
 
-  m_profileButton.signal_clicked().connect(
-      sigc::mem_fun(*this, &AppWindow::on_profile_button_clicked));
-  m_teaButton.signal_clicked().connect(
-      sigc::mem_fun(*this, &AppWindow::on_tea_button_clicked));
+  Helper::connect_signals(m_profileButton, m_teaButton, m_contentArea,
+                          m_teaList);
 }
 
 void AppWindow::on_profile_button_clicked() {
@@ -33,4 +20,8 @@ void AppWindow::on_profile_button_clicked() {
   m_contentArea.set_child(*profileLabel);
 }
 
-void AppWindow::on_tea_button_clicked() { m_contentArea.set_child(m_teaList); }
+void AppWindow::on_tea_button_clicked() {
+  if (m_contentArea.get_child() != &m_teaList) {
+    m_contentArea.set_child(m_teaList);
+  }
+}

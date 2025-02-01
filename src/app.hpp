@@ -6,13 +6,11 @@
 class AppWindow;
 
 class App : public Gtk::Application {
- protected:
-  App();
-
  public:
   static Glib::RefPtr<App> create();
 
  protected:
+  App();
   void on_activate() override;
 
  private:

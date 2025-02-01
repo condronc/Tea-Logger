@@ -6,10 +6,7 @@
 class TeaEntry : public Glib::Object {
  public:
   static Glib::RefPtr<TeaEntry> create(int id, const Glib::ustring& name,
-                                       const Glib::ustring& date) {
-    return Glib::make_refptr_for_instance<TeaEntry>(
-        new TeaEntry(id, name, date));
-  }
+                                       const Glib::ustring& date);
 
   int get_id() const { return m_id.get_value(); }
   Glib::ustring get_tea_name() const { return m_name.get_value(); }
