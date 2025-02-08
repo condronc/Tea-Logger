@@ -11,18 +11,3 @@ void Helper::setup_layout(Gtk::Paned& mainPaned, Gtk::Box& sidebarBox,
   mainPaned.set_end_child(contentArea);
   mainPaned.set_position(200);
 }
-
-void Helper::connect_signals(Gtk::Button& profileButton, Gtk::Button& teaButton,
-                             Gtk::ScrolledWindow& contentArea,
-                             TeaList& teaList) {
-  profileButton.signal_clicked().connect([&contentArea] {
-    auto profileLabel = Gtk::make_managed<Gtk::Label>("Profile Page");
-    contentArea.set_child(*profileLabel);
-  });
-
-  teaButton.signal_clicked().connect([&contentArea, &teaList] {
-    if (contentArea.get_child() != &teaList) {
-      contentArea.set_child(teaList);
-    }
-  });
-}

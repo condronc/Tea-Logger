@@ -10,10 +10,6 @@ class Helper {
   static void initialize_window(Gtk::ApplicationWindow& window);
   static void setup_layout(Gtk::Paned& mainPaned, Gtk::Box& sidebarBox,
                            Gtk::ScrolledWindow& contentArea);
-  static void connect_signals(Gtk::Button& profileButton,
-                              Gtk::Button& teaButton,
-                              Gtk::ScrolledWindow& contentArea,
-                              TeaList& teaList);
 };
 
 #endif

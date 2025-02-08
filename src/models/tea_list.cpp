@@ -1,5 +1,7 @@
 #include "tea_list.hpp"
 
+#include <iostream>
+
 TeaList::TeaList() : Gtk::Box(Gtk::Orientation::VERTICAL) {
   m_listStore = Gio::ListStore<TeaEntry>::create();
   m_selectionModel = Gtk::SingleSelection::create(m_listStore);
@@ -11,15 +13,32 @@ void TeaList::initialize_ui() {
   setup_columns();
   load_tea_entries();
 
-  m_columnView.set_vexpand(true);
-  m_columnView.set_hexpand(true);
-  m_columnView.set_model(m_selectionModel);
+  auto list_box = Gtk::Box(Gtk::Orientation::VERTICAL);
+  list_box.append(m_scrolledWindow);
+  list_box.set_vexpand(true);
+  auto button_box = Gtk::Box(Gtk::Orientation::HORIZONTAL);
 
-  m_scrolledWindow.set_child(m_columnView);
-  m_scrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC,
-                              Gtk::PolicyType::AUTOMATIC);
-  m_scrolledWindow.set_vexpand(true);
-  append(m_scrolledWindow);
+  auto m_logButton = Gtk::make_managed<Gtk::Button>("Log");
+  auto m_addButton = Gtk::make_managed<Gtk::Button>("Add");
+  auto m_editButton = Gtk::make_managed<Gtk::Button>("Edit");
+  auto m_deleteButton = Gtk::make_managed<Gtk::Button>("Delete");
+
+  button_box.append(*m_logButton);
+  button_box.append(*m_addButton);
+  button_box.append(*m_editButton);
+  button_box.append(*m_deleteButton);
+
+  append(button_box);
+  append(list_box);
+
+  m_logButton->signal_clicked().connect(
+      sigc::mem_fun(*this, &TeaList::on_log_clicked));
+  m_addButton->signal_clicked().connect(
+      sigc::mem_fun(*this, &TeaList::on_add_clicked));
+  m_editButton->signal_clicked().connect(
+      sigc::mem_fun(*this, &TeaList::on_edit_clicked));
+  m_deleteButton->signal_clicked().connect(
+      sigc::mem_fun(*this, &TeaList::on_delete_clicked));
 }
 
 void TeaList::setup_columns() {
@@ -39,6 +58,14 @@ void TeaList::setup_columns() {
 
   m_columnView.append_column(name_column);
   m_columnView.append_column(date_column);
+  m_columnView.set_vexpand(true);
+  m_columnView.set_hexpand(true);
+  m_columnView.set_model(m_selectionModel);
+
+  m_scrolledWindow.set_child(m_columnView);
+  m_scrolledWindow.set_policy(Gtk::PolicyType::AUTOMATIC,
+                              Gtk::PolicyType::AUTOMATIC);
+  m_scrolledWindow.set_vexpand(true);
 }
 
 void TeaList::load_tea_entries() {
@@ -81,4 +108,20 @@ Glib::RefPtr<Gtk::SignalListItemFactory> TeaList::create_column_factory(
       });
 
   return factory;
+}
+
+void TeaList::on_log_clicked() {
+  std::cout << "Log button clicked!" << std::endl;
+}
+
+void TeaList::on_add_clicked() {
+  std::cout << "Add button clicked!" << std::endl;
+}
+
+void TeaList::on_edit_clicked() {
+  std::cout << "Edit button clicked!" << std::endl;
+}
+
+void TeaList::on_delete_clicked() {
+  std::cout << "Delete button clicked!" << std::endl;
 }

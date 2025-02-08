@@ -17,6 +17,10 @@ class TeaList : public Gtk::Box {
   void initialize_ui();
   void setup_columns();
   void load_tea_entries();
+  void on_log_clicked();
+  void on_add_clicked();
+  void on_edit_clicked();
+  void on_delete_clicked();
   Glib::RefPtr<Gtk::SignalListItemFactory> create_column_factory(
       std::function<Glib::ustring(const Glib::RefPtr<TeaEntry>&)>
           get_text_func);

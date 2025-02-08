@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "appwindow.hpp"
+#include "helpers/helper.hpp"
 
 App::App()
     : Gtk::Application("tea.logger", Gio::Application::Flags::HANDLES_OPEN) {}
